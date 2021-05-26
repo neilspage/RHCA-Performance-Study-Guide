@@ -8,25 +8,25 @@
 
 ## Profiling Tools
 
-###VMstat
+### VMstat
 The vmstat command, if given no arguments, will print out the averages of various system statistics since boot. The vmstat command accepts two arguments. The first is the delay, and the second is the count. The delay is a value in seconds between output. The count is the number of iterations of statitics to report. If no count is given, vmstat will continously report statistics.
 
-###Sar
+### Sar
 The [sar](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/commands.md#sar) command is a multipurpose analysis tool that is part of the systat package. It works in two modes. It can read data collected by a cron job every 10 mintues, or it can be used to collect instantaneous data about the state of the system.
 
 The cron job is install as ```/etc/cron.d/sysstat```, which runs the /usr/lib64/sa/sa1 and /usr/lib64/sa/sa2 commands that collect data using /usr/lib64/sa/sadc and sar. This data is stored in /var/log/sa/sadd, where dd is the two-digit day of the month.
 
 For best results when using sar, make sure to set a locale with a LANG environment variable that provides 24-hour time support.
 
-###IOstat
+### IOstat
 
-###MPstat
+### MPstat
 The [mpstat](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/commands.md#mpstat) command reports CPU-related stats. Like sar, it may be necessary to configure the LANG for 24-hour time.
 
-##Plotting Data
+## Plotting Data
 [gnuplot](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/commands.md#gnuplot) is a data plotting program that can take data which you have collected and graph it in a number of ways.
 
-###gnuplot demonstration
+### gnuplot demonstration
 1. Capture two samples of the one-, five-, and 15-minute load averages from uptime, using awk to process the output into a simpler form to handle. In the following demonstration, we will also start some arbitrary system activity with dd to put load on the system
 ```shell
 uptime | awk '{print $1, $(NF-2), $(NF-1), $NF }' > /tmp/uptime
@@ -68,7 +68,7 @@ set yrange [0:]
 plot '/tmp/uptime' using 1:4
 ```
 
-##Performance Co-Pilot
+## Performance Co-Pilot
 Performance Co-Pilot, or pcp for short, allows admins to collect and graph data from various subsystems.
 
 If graph data is also desired, an administrator will also need to install the pcp-gui package. pcp-gui provides additional utilities like pmchart to generate graphical data of machine metrics.
@@ -123,24 +123,24 @@ Could change that using this command:
 echo "8192 87380 6291456" > /proc/sys/net/ipv4/tcp_rmem
 
 
-###Manage /proc/sys tunables with sysctl
+### Manage /proc/sys tunables with sysctl
 To list all avilable tunables:
 ```shell
 sysctl -a
 ```
-####Change sysctl tunables by command line
+#### Change sysctl tunables by command line
 ```shell
 sysctl -w vm.swappiness=10
 ```
 
-####Change sysctl tunables by configuration file.
+#### Change sysctl tunables by configuration file.
 To permanently change /proc/sys kernel tunables, the settings need to be stored in the /etc/sysctl.conf
 ```shell
 echo "vm.swappiness=10" >> /etc/sysctl.d/filename.conf
 sysctl -p /etc/sysctl.conf - makes the change without rebooting the system
 ```
 
-###Configuring module parameters
+### Configuring module parameters
 These kernel modules allow the kernel to automatically load into memory only the components that are needed for a particular system.
 
 Many kernel modules have settings that can be changed. Some settings can only be assinged when a kernel module is loaded, while others can be set upon loading or changed on the fly.
@@ -165,7 +165,7 @@ systemctl enable tuned
 systemctl start tuned
 ```
 
-###Selecting a ```tuned``` profile
+### Selecting a ```tuned``` profile
 Different workloads and conflicting tuning goals for server systems, such as performance, latency, and power saving require different tuning.
 
 The tuned package contains the [tuned-amd](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/commands.md#tuned) command, which acts as an interface to change settings of the tuned daemon.
@@ -178,7 +178,7 @@ Some tuned profiles activate helper programs that montior the activity of select
 
 To configure dynamic tuning, change the dynamic_tuning setting to 1 in /etc/tuned/tuned_main.conf
 
-##Creating Custom tuned Profiles
+## Creating Custom tuned Profiles
 The ```tuned``` service supports the creation and use of custom tuning profiles. The tuned package ships with build-in profiles residing in ```/usr/lib/tuned/profilename/```.
 
 The /etc/tuned directory holds the active_profile file, which contains the name of the currently active tuned profile and the tuned-main.conf configuration file for configuring dynamic tuning.
@@ -190,13 +190,13 @@ mkdir /etc/tuned/myprofile
 
 In the newly created directory for the custom profile, tuned expects the tuned.conf configuration file.
 
-###Inherit tuning settings from existing profile
+### Inherit tuning settings from existing profile
 ```shell
 [main]
 include=<profile-name>
 ```
 
-###Specifiy Additional sections in the custom profile
+### Specifiy Additional sections in the custom profile
 ```shell
 [NAME]
 type=<pluginname>
@@ -210,23 +210,23 @@ devices=sd*
 readahead=4096
 ```
 
-###Execute a shell script with the cusotom profiles
+### Execute a shell script with the cusotom profiles
 To add the script /etc/tuned/myprofile/script.sh to the myprofile tuning profile, add the following section to /etc/tuned/myprofile/tuned.conf
 ```shell
 [script]
 script=script.sh
 ```
 
-###Set sysctl parameters in the custom profile
+### Set sysctl parameters in the custom profile
 ```shell
 [sysctl]
 net.ipv4.icmp_echo_ignore_all=1
 ```
 
-###Debugging custom tuned profiles
+### Debugging custom tuned profiles
 /var/log/tuned
 
-##Using tuna to create a tuned profile
+## Using tuna to create a tuned profile
 The GUI can show you what effect the tuning profile had.
 Use this gui to active settings in a custom tuned profile.
 ```shell
@@ -236,7 +236,7 @@ tuna -g
 
 #Chapter 4 - Limiting Resource Usage
 
-##Using ulimit
+## Using ulimit
 Ulimit is a mechanism to limit system resources.
 Can set hard or soft limits. Soft limits can be temporaily exceeded by users.
 ```shell
@@ -247,7 +247,7 @@ Configuration files:
 /etc/security/limits.d/20-nproc.conf
 /etc/limits.conf
 ```
-##Configuring persistent ulimit rules
+## Configuring persistent ulimit rules
 Using the pam_limits module, ulimits can be applied on a per user/group bases in:
 ```shell
 /etc/security/limits.d/<name>.conf
@@ -257,7 +257,7 @@ For example, to limit all the users in the managers group to a maximum of three 
 @managers hard maxlogins 3
 ```
 
-###Setting limits for services
+### Setting limits for services
 With systemd, it is also possible to set POSIX limits for services. This is accomplished using the family of Limit*= entries in the [Service] block of a unit file.
 
 Unit Files:
@@ -281,7 +281,7 @@ The linux kernel offers a mechanism for controlling resources in a fine-grained 
 
 Inside a cgroup, resources are shared equally, but different limits and/or weights can be set on different cgroups, as long as they don't exceed the limits of the parent cgroup. When a new cgroup is created it normally inherits the limits set on its parent cgroup, unless explicity overridden.
 
-###cgroups and systemd
+### cgroups and systemd
 By default, systemd will subdivied the cpu, cpuacct, blkio, and memory cgroups into three equal parts (called slices by systemd): ```system``` for system services and daemons, ```machine``` for virtual machines, and ```user``` for user sessions.
 
 Administratos can create extra *.slice units, with their own limits, and assign services to these slices. It is also possible to create slices as children of another slice by naming them ```<parent>-<child>.slice```.
@@ -293,7 +293,7 @@ Administratos can create extra *.slice units, with their own limits, and assign 
 
 * machine.slice - Virutal machines managed by libvirt will be automatically assigned a new child slice of this slice.
 
-###Inspecting cgroups
+### Inspecting cgroups
 ```systemd``` ships with two tools to inspect the current cgroup/slice layout: systemd-cgtop and systemc-cgls.
 
 A single command can also be run inside a systemd slice by executing it with [systemd-run](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/commands.md#systemd-run) command, and using the --slice=option.
@@ -318,7 +318,7 @@ BlockIOAccounting=true
 
 The easiest way to add these settings to a unit is to use a drop-in file. Drop-in files can be configured by creating a directory under /etc/systemd/system/ named after the unit to be configured wiht .d appended. For example, the drop-in directory for sshd.service would be /etc/systemd/system/sshd.service.d/.
 
-####Enforcing limits
+#### Enforcing limits
 Create a stanza in the unit files:
 ```shell
 [System]
@@ -329,7 +329,7 @@ BlockIO*=
 
 A full list of the directives can be found in [man systemd.resource-control](http://www.freedesktop.org/software/systemd/man/systemd.resource-control.html)
 
-####Running services in a custom slice
+#### Running services in a custom slice
 Ro run a service in a different slice, the setting Slice=other.slice can be used inside the [Service] block, where other.slice equls the name of a custom slice.
 ```shell
 [Service]
@@ -338,23 +338,23 @@ Slice=other.slice
 
 To create a slice as a child of another slice(inheriting all settings from the parent unless explicity overridden), the slice should be named parent-child.slice
 
-#Chapter 5 - Hardware Profiling
-##Hardware Resources
-###CPU
-###Memory
-###Storage
-###Networking
+# Chapter 5 - Hardware Profiling
+## Hardware Resources
+### CPU
+### Memory
+### Storage
+### Networking
 
-##Reviewing kernel messages
+## Reviewing kernel messages
 ```shell
 cat /proc/kmsg
 cat /var/log/dmesg
 ```
-###Exploring dmesg output
+### Exploring dmesg output
 ```shell
 less /var/log/dmesg
 ```
-##Determining CPU information
+## Determining CPU information
 ```shell
 lscpu
 lscpu -p
@@ -363,19 +363,19 @@ getconf -a
 ```
 Output of lscpu is explained on pg. 112
 
-##Retrieving SMBIOS/DMI information
+## Retrieving SMBIOS/DMI information
 dmidecode utility provided by the dmidecode package probes the local SYstem Management BIOS (SMBIOS) and Desktop Management Interface.
 ```shell
 dmidecode
 ```
-##Retrieving peripheral information
+## Retrieving peripheral information
 ```shell
 lspci
 lsusb
 lsusb -vv
 ```
 
-##Generating a system profile with sosreport
+## Generating a system profile with sosreport
 ```shell
 sosreport -l
 ```
@@ -385,33 +385,33 @@ sosreport -l
 disable = rpm, grub2
 ```
 
-##Profiling Storage
-###Storage Hardware
-####Magnetic tapes
-####Magnetic hard disks
-####Optical discs
-####Flash drives
-####Punch cards
-###Profiling Storage
-####Profiling storage with bonnie++
-####Profiling storage with zcav
+## Profiling Storage
+### Storage Hardware
+#### Magnetic tapes
+#### Magnetic hard disks
+#### Optical discs
+#### Flash drives
+#### Punch cards
+### Profiling Storage
+#### Profiling storage with bonnie++
+#### Profiling storage with zcav
 ```shell
 zcav -c1 -lvda1.zcav -f/dev/vda1
 ```
-####Plotting zcav data with gunplot
-####Different forms of throughput
+#### Plotting zcav data with gunplot
+#### Different forms of throughput
 
 
-#Chapter 6 - Software Profiling
+# Chapter 6 - Software Profiling
 Multitasking -
 Process Scheduler -
 
-##O(1) Scheduler
+## O(1) Scheduler
 Run queue -
 Expiered queue -
 It makes it difficult to measure what the real priority of a process is.
 
-##Completely Fair Scheduler(CFS)
+## Completely Fair Scheduler(CFS)
 Uses a red-black tree based on virtual time. This virtual time is based on the time waiting to run and the number of processes vying for CPU time, as well as the priority of the process(es). The process with the most virtual time, which is the longest time waiting for the CPU, gets to use the CPU. As it uses CPU cycles, its virtual time decreases. Once the process no longer has the most virtual time, it is pre-empted and the process with the most virtual time then runs. 
 
 Kernel tunables for CFS available in /proc/sys/kernel:
@@ -441,9 +441,9 @@ systemctl set-property --runtime httpd.service CPUShares=2048
 systemctl show -p CPUShares system.slice
 ```
 
-##Real-time CPU scheduling
+## Real-time CPU scheduling
 
-TWo real-time scheduling policies:
+Two real-time scheduling policies:
 
 1. SCHED_RR - a round-robin scheduling policy. Processes at the same priority level using the round-robin scheduling policy are only allowed to run for a maximum time quantum.
 
@@ -455,7 +455,7 @@ A system admin can prevent real-time tasks from taking all CPU time with two sys
 
 * ```kernel.sched_rt_runtime_us```: The share of the time frame that can be allocated for real time. THe default for this setting on a bare-metal installation of Red Hat Enterprise LInux 7 is 950000, which means that 0.95 seconds of the 1 second period can be allocated to real-time scheduled processes. The remaining 0.05 second is used by SCHED_OTHER. This setting prevents the system from allocation all CPU time to real-time processes, which would cause the system to be unresponsive. A setting of -1 disables reservation of time for real-time and non-real-time processes.
 
-###Non-real-time scheduling policies
+### Non-real-time scheduling policies
 
 1. SCHED_NORMAL - The standard round-robin style time-sharing policy
 
@@ -463,35 +463,35 @@ A system admin can prevent real-time tasks from taking all CPU time with two sys
 
 3. SCHED_IDLE - is for running very low priority applications. The priority of processes running with SCHED_IDLE is lower than a process running with nice 19
 
-###Setting process priority with nice and renice
+### Setting process priority with nice and renice
 
 ```shell
 nice -n -5 sha1sum /dev/zero
 renice 19 2190
 ```
 
-###Changing process schedulers
+### Changing process schedulers
 The chrt command may start a program with a specified scheduler and a given priority. It may also change the scheduler and optionally the priority on an already running process.
 ```shell
 chrt [scheduler] priority command
 ```
 
-###The effects of different real-time policies running concurrently
+### The effects of different real-time policies running concurrently
 You can change the scheduler policy with the following command:
 ```shell
 chrt -p -f 10 $(cat /var/run/sshd.pid)
 ```
 
-##Tracing System and Library Calls
+## Tracing System and Library Calls
 
 * system call - A kernel-provided function that is called from a program. Always operating system specific.
 
 * library call - A function provided by a library.
 
 
-###System calls and library calls
+### System calls and library calls
 
-###Tracing System calls
+### Tracing System calls
 
 ```shell
 strace uname
@@ -508,7 +508,7 @@ strace -e open -c uname
 ```
 
 
-###Tracing library calls
+### Tracing library calls
 The ```ltrace``` command displays calls made to library functions by a process.
 
 ```shell
@@ -520,7 +520,7 @@ ltrace -f elinks -dump http://classroom.example.com/pub
 
 ## Profiling CPU Cache Usage
 
-###Cache architecture
+### Cache architecture
 Cache memory is organized into lines. Each line of cache can be used to cache a specific location in memory.
 
 The cache controller first checks to see if the requested address is in cache and will satisfy the processor's request from there if it is. This is referred to as a cache hit. If the requested memory is not in cache, then a cache miss occurs and the requested location must be read from main memory and brought into cache. This is referred to as a cache-line fill.
@@ -533,17 +533,17 @@ Cache memory can be configured as either write-through or write-back. IF write-t
 
 * Set associative cache memory is uually referred to as n-way set associative, where n is some power of 2. Set associative cache memory allows a memory location to be cached into any one of n lines of cache.
 
-###Locality of reference
+### Locality of reference
 Programs tend to exhibit certain patterns when accessing data. A program accessing memory location X is most likely to want to acess memory location X+1 in the next few cycles of its execution. This behavior of a program is referred to as spatial locality of reference. This is one of the reasons that it si more efficient to move data from disk to memory in pages rather than one byte at a time. Another type of pattern, temporal locality of reference, occurs when a program accesses the same memory location repeatedly during a time period.
 
-###Profiling cache usage with valgrind
+### Profiling cache usage with valgrind
 ```shell
 yum install valgrind cache-lab
 valgrind --tool=cachegrind cache1
 ```
 
 
-###Profilling cache misses with perf
+### Profilling cache misses with perf
 ```shell
 perf list
 perf stat -e cache-misses cache1
@@ -552,7 +552,7 @@ perf stat -e cache-misses cache1
 
 # Chapter 7 - Using Systemtap
 
-##Installing systemtap
+## Installing systemtap
 
 You must install these packages:
 
@@ -567,9 +567,9 @@ Verify works just fine:
 stap -e 'probe begin { printf("Hello World"!\n") exit()}'
 ```
 
-##Using stap to run SystemTap scripts
+## Using stap to run SystemTap scripts
 
-##Compiling SYstemtap programs to portable kernel modules
+## Compiling SYstemtap programs to portable kernel modules
 ```shell
 stap -p 4 -v -m syscalls_by_proc /usr/share/doc/systemtap-client-*/examples/process/syscalls_by_proc.stp
 staprun syscalls_by_proc
@@ -577,11 +577,11 @@ staprun syscalls_by_proc
 
 
 
-##Running SystemTap programs as a non-root user - pg. 178
+## Running SystemTap programs as a non-root user - pg. 178
 Modules (.ko files) must be plublished in /usr/lib/modules/$(uname -r)/systemtap in order for non-root users to have access to them.
 User must also be in the ```stapusr``` system group.
 
-##Deploying SystemTap Instrumentation Modules - pg. 183
+## Deploying SystemTap Instrumentation Modules - pg. 183
 
 # Small File Tuning - Chapter 8
 ##Analyzing a Small File Workload
@@ -601,12 +601,12 @@ Disk Schedular algorithms
 
 * ext4 - In Glossary
 
-###Benchmarking file system performance
+### Benchmarking file system performance
 For benchmarking results to be relevant, they must be obtained using benchmarking routines that simulate real-world workloads at the file system layer.
 
-#Tuning the server for large memory workload - Chapter 9
+# Tuning the server for large memory workload - Chapter 9
 
-##Memory Management
+## Memory Management
 A normal page size is 4KiB.
 
 Processes do not address physical memory directly. Instead, each process has a virtual address space. When a process is allocated memory, the physical address of a page frame is mapped to one of the process's virtual addresses. From the perspective of a process, it has a private memory space and it can only see physical page frames that have been mapped into one of its virtual addresses.
@@ -614,39 +614,39 @@ Processes do not address physical memory directly. Instead, each process has a v
 ps up <pid>
 ```
 
-##Page tables and the TLB
+## Page tables and the TLB
 Since each process maintains its own virtual address space, each process needs its own table of mapings of the virtual addresses of pages to the physical addresses of page frames in RAM. On a 64-bit system, the high 52 bits (63 to 12) are the page number. However, on processors in production at the time of writing, the highest 16 bits of the virtual address are reserved, which causes a large block of virtual addresses to be unavailable for use by processes. This was done because it conserves certain resources on current hardware designs. 
 
 Major and minor page faults - see glossary
 
 
 
-##Process memory
+## Process memory
 In RHEL7, memory management settings are moved from the process level to the application level through binding the system of cgroup hierarchies with the systemd unit tree.
 
-##Finding memory Leaks
+## Finding memory Leaks
 To identify memory leaks, use tools like ps, top, free, sar -r or sar -R, or use dedicated tools like valgrind.
 
 
 See commands page for valgrind command examples.
 
-##Tuning swap
+## Tuning swap
 vmstat can be used to identify swapping. The critical columns for identifing swaps are ```si``` and ```so```.
 
-###System memory and page cache
+### System memory and page cache
 The kernel uses most unallocated memory as a cache to store data being read from or written to disk. The next time that data is needed, it can be fetched from RAM rather than the disk.
 
-###Swappiness
+### Swappiness
 When the kernel wants to free a page of memory, it has to evaluate the tradeoff between two choices. It can swap a page out from process memory, or it can drop a page from the page cache. In order to make this decision, the kernel will perform the following calculation:
 
 [swap_tendency](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/formulas.md#swap-tendency)
 
 Tuning [vm.swappiness](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/tunables.md#sysctl-tunables) can influence a system serverly. Set [vm.swappiness](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/tunables.md#sysctl-tunables) to 100 and the system will almost always prefer to swap out pages over reclaiming a page from the page cache. This will use more memory for pache caches, which can greatly increase performance for an I/O-heavy workload. Setting it to 1, on the other hand, will force the s ystem to swap as little as possible.
 
-###Optimizing swap spaces
+### Optimizing swap spaces
 When mulitple swap spaces are in use, the mount option [pri=value](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/commands.md#swapon) can be used to specify the priority of use for each space. Swap spaces with a higher ```pri``` value will be filled upf irst before moving on the one with a lower priority. When mulitple swap spaces are activated with the same priority, they will be used in a round-robin fashion.
 
-##Managing Memory Reclamation
+## Managing Memory Reclamation
 Physical memory needs to be reclaimed from time to time to stop memory from fillingup, rendering a system unusable. Memory can be in different states:
 
 * [Free](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/glossary.md#states-of-a-memory-page)
@@ -667,36 +667,33 @@ See [sysctl tunables](https://github.com/elextro/RHCA-Performance-Study-Guide/bl
 
 Setting lower ratios results in more frequent but shorter writes, suited for an interactive system, while setting hiegher raios will result in fewer but bigger writes, causing less overhead in total but ppossibly resulting in higher response times for interactive applications.
 
-###Out-of-memory handling and the "OOM Killer"
+### Out-of-memory handling and the "OOM Killer"
 When a minor page fault happens, but there are no free pages avilable, the kernel tries to relaim emory to satisfy the request. If it cannot reclaim sufficient memory in a timely manner, an out-of-memory condition occurs.
 
 To determine which process the OOM killer should kill, the kernel keeps a running badness score for every process, which can be viewed in /proc/PID/oom_score. The higher the score, the more likely the process will be killed by the OOM killer.
 
 [More OOM Tunables](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/tunables.md#oom-tunables)
 
-###Memory zones and OOM
+### Memory zones and OOM
 It is possible for the system to be in an out-of-memory condition while ```free``` still reports memory available. This is because sometimes memory is needed from a particular memory zone that is not available.
 
 One way to observe memory consumption on a per-zone basis is by looking in the /proc/buddyinfo file. The memory management system uses a "buddy allocator" to organize free memory into contiguous chunks.
 
-##Managin Non-uniform Memory Access
+## Managin Non-uniform Memory Access
 On a NUMA system, system memory is divided into zones that are connected directly to particular CPUs or sockets.
 
 To see how a system is divided into nodes, use the [numactl --hardware](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/commands.md#numactl) command from the numactl package.
 
 
-#Tuning for a cpu-intensive workload - Chapter 10
+# Tuning for a cpu-intensive workload - Chapter 10
 
-##Configuring CPU scheduler wakeups
+## Configuring CPU scheduler wakeups
 In normal operation, CFS tries to give each process an even chunk of CPU when there are multiple processes in state RUNNABLE. It does this by keeping rack of how much CPU each process has used. The scheduler wakes up every [kernel.sched_min_granularity_ns](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/tunables.md#configuring-cpu-scheduler-wakeups) nanoseconds ( a nonsecond is 10^9 seconds, or one-billionth of a second). When the scheduler wakes up, it checks if the current running process is the one that has had the least amount of CPU so far. If it is, the process is allowed to keep on running. If the process is not the one that has had the least amount of CPU time, it will be kicked off the CPU(pre-empted). For batch processing serversk, like compute nodes, it might be useful to increase the kernel.sched_min_granularity_ns systctl so that the scheduler wakes up less often.
 
-##Configuring maximum CPU usage
+## Configuring maximum CPU usage
 The CFS scheduler also has the idea of scheduler groups implemented. Using scheduler groups allows processes to be no longer seen as equals but rather process groups, in this case implemented using cgroups with the cpu controller. Each group is assigned a weight using the [cpu.shares]() tunable inside the group. The default weight for the / cgroup and any new cgroups created is 1024.
 
-
-
-
-##Pinning Processes
+## Pinning Processes
 Sometimes it is desirable to limit on which CPU(s) a process is allowed to run. systemd offers a convenient way limiting the CPUs available to a service using the [CPUAffinity=](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/tunables.md#drop-in-tunables) setting inside a [Service] block of a unit definition. This setting takes a separated list of CPU indexes the service is allowed to run on, with the first CPU being index 0, the second index 1, etc..
 
 A scalable way to limit the available CPUs and memory zones is by using a cpuset cgroup.
@@ -707,7 +704,7 @@ A scalable way to limit the available CPUs and memory zones is by using a cpuset
 
 * [cpuset.{cpu,memory}_exclusive](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/tunables.md#cpuset-cgroup-tunables)
 
-##Balancing Interrupts
+## Balancing Interrupts
 Since an interrupt needs to be handled when it occurs, a CPU will need to be chosen on which to execute the corresponding code. On a single CPU system the choice is easy, but when there are multiple available CPUs, the choise of which CPU to execute the choice of which CPU to execute the code on can become interesting.
 
 The file /proc/interrupts details how often specific interrupts have been handled on a specific CPU.
@@ -740,16 +737,16 @@ So far, it has been assumed processes are being scheduled in the default schedul
 * [SCHED_RR](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/glossary.md#cpu-schduling-policies)
 
 
-#Tuning a file server - Chapter 11 - pg. 285
+# Tuning a file server - Chapter 11 - pg. 285
 
-##Selecting a tuned profile for a file server
+## Selecting a tuned profile for a file server
 The throughput-performance profile, and the network-throughput profile that inherits its properties, both increase the default [readahead](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/tunables.md#tuned) setting for block devices by a factor of 32. This setting influences how much data the kernel will attempt to read ahead when it sees contigous requests come in.
 
 The [blockdev](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/commands.md#blockdev) command can be used to read and write the ```read_ahead_kb``` tunable. Use the ```--getra``` and ```setra``` options to blockdev to get and set the readahead values respectively.
 
 
-##File System Performance
-###File fragmentation
+## File System Performance
+### File fragmentation
 Both the default file system in RHEL7, XFS, and its predecessor, ext4, attempt to minimize fragmentation by pre-allocating extra data blocks on disk when a file is being written. If the extra blocks have not yet been used when the file is closed, they are marked as free again.
 
 In order to make it more likely that large areas of contiguous free space are always available, the ext4 file system also sets aside reserved space, normally given as a percentage of total file system space or a number of file system blocks.
@@ -766,7 +763,7 @@ On ext4 file systems, the number of free file system extents of a given size can
 
 Both XFS and ext4 provide tools for performing online defragmentation. The [xfs_fsr](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/commands.md#xfs_fsr) and [e4defrag](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/commands.md#e4defrag) utilities are available for the XFS and ext4 file systems, respectively. Both tools offer multiple defragmentation methods
 
-###Journal placement
+### Journal placement
 A journal speeds file system recovery by being a sort of logbook for the file system. Whenever a change is about ot be made to the file system, the transaction will be recorded in the journal. After the operation is completed, the journal entry is removed.
 
 The ext3/ext4 journal can work in three different modes, chosen by passing the data=mode option to the file system at mount time. The default mode is ```ordered```. Thre three modes are:
@@ -787,7 +784,7 @@ mkfs -t xfs -l logdev=/dev/ssd1 /dev/sdc1
 mount -o logdev=/dev/sdd1 /dev/sdc1 /mnt
 ```
 
-###Stripe unit and width
+### Stripe unit and width
 What typically has a much greater performance impart is how file system metadata is aligned on disk when the disk in question is striped array (RAID 0, RAID 4, RAID 5, RAID 6). If a file system is not laid out to match the RAID loayout, it could happen that a file system metadata block is spread out over two disks, causing two disk requests instead of one, or that all of the metadata ends up on one individual disk, causing that disk to become a hot spot.
 
 To counter this, lay out your file system during creation to match the layout of the RAID array that it resides on. For XFS file systems, optimization for striped allocation requires the following information:
@@ -820,12 +817,12 @@ These numbers are provided to mkfs at file system creation
 mkfs -t ext4 -E stride=16,stripe-width=64 /dev/san/lun1
 ```
 
-##Tuning network performance.
+## Tuning network performance.
 There are a variety of tools for measuring network throughput. One of the newer and more extensive tools is [qperf](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/commands.md#qperf). When using an Ehternet network, qperf can measure TCP, UDP, RDS, SCTP, and SDP socket throughputs and latencies.
 
 [qperf](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/commands.md#qperf) needs to run on two machines. One(the listener) runs qperf without any options. The other (the sender) invokes qperf with the name of the first host as the first argument, followed by the test options.
 
-##Tuning network queues
+## Tuning network queues
 The following outline shows the steps of network transmission:
 
 * Data is written to a socket (a file-like object) and is then put in the transmit buffer.
@@ -867,15 +864,15 @@ To configure a higher MTU, add the following line to ```/etc/sysconfig/network-s
 MTU=size
 ```
 
-#Tuning a database server - Chapter 12
+# Tuning a database server - Chapter 12
 
-##System memory
+## System memory
 
-##Disk storage
+## Disk storage
 
-##Networking
+## Networking
 
-##Managing Inter-process Communication - pg. 338
+## Managing Inter-process Communication - pg. 338
 Semaphores allow two or more processes to coordinate access to shared resources. Message queues allow processes to cooperatively function by exchanging messages. System administrators can set limits on the number of SysV IPC resources available to processes.
 
 Current SysV IPC resource limits can be obtained by running [ipcs](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/commands.md#ipcs)
@@ -885,7 +882,7 @@ The SysV IPC mechanisms are tuned using entries in [/proc/sys/kernel/](https://g
 
 /dev/shm - temporary storage. Will be lost if a power failure occurs.
 
-##Managing Huge Pages
+## Managing Huge Pages
 The Linux kernel supports large-sized memory pages through the huge pages mechanism(sometimes known as bigpages, largepages or the hugetlbfs file system). Most processor architectures support multiple page sizes.
 
 The number of translation lookaside buffer(TLB) entries for a process is fixed, but with larger page size, the TLB space for a processor becomes correspondingly larger. Having fewer TLB entries that point to more memory means that a TLB hit is more likely to occur.
@@ -908,7 +905,7 @@ mount -t hugetlbfs none /largefile
 or in /etc/fstab
 hugetlbfs /hugepages hugetlbfs defaults
 ```
-###Transparent huge pages
+### Transparent huge pages
 RHEL6.2 introduced kernel functionality that supports the creation and management of huge memory pages without explicit developer or system administrator intervention. This feature is called transparent huge pages(THP). THP are enabled by default and they are used to map all of the kernel adress space to a single huge page to reduce TLB pressure. They are also used to map anonymous memory regions used by applications to allocate dynamic memory.
 
 THP differ from standard huge pages in that they are allocated and managed by the kernel automatically when they are enabled. They can also be swapped out of memory, unlike standard huge pages.
@@ -916,25 +913,25 @@ THP differ from standard huge pages in that they are allocated and managed by th
 THP tunables are found in /sys tree under the [/sys/kernel/mm/transparent_hugepage](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/tunables.md#transparent-huge-pages-tunables) directory.
 
 Transparent huge pages are not recommended for use with datbase workloads; instead, if huge pages are desired, they should be preallocated with the [sysctl vm.nr_hugepages](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/tunables.md#huge-pages-tunables) parameter.
-##Overcomitting Memory
-###Tuning overcommit
+## Overcomitting Memory
+### Tuning overcommit
 Many applications request to allocate more memory than they will use. Other applications require the kernel to allocate more memory for a program than is available on the system. One way to address these situation is to manage the machine's memory overcommitment policy. A machine's memory overcommitment policy is set using the [vm.overcommit_memory](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/tunables.md#overcommit-tunables) tunable.
 
 The ```Committed_AS``` field in ```/proc/meminfo``` shows an estimate of how much RAM is required to avoid an out-of-memory(OOM) condition for the current workload on a system.
 
 The default for memory overcommitment on RHEL6 and later is 0 heuristic overcommit handling. If a machine is in a situation where it has overcommitted too much and now has to deliver more memory than is possible, ther kernel OOM killer thread is invoked and processes are killed.
-##Tuning swappiness
+## Tuning swappiness
 [vm.swappiness](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/tunables.md#sysctl-tunables)
-##Tuning cached page writes
+## Tuning cached page writes
 Beyond moving the I/O elevator to deadline, which would give preference to disk reads, an administrator can also change settings that control how the system manages cached data of file writes. There are [sysctl tunables](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/tunables.md#controling-per-bdi-flush-threads-for-writing-dirty-pages-to-disk) that control writing of cached file data.
 
 #Tuning Power usage - Chapter 13 - pg.359
-##Tuning and Profiling Power Usage
+## Tuning and Profiling Power Usage
 [powertop]()
 ##Tuning power usage
 [powertop2tuned](https://github.com/elextro/RHCA-Performance-Study-Guide/blob/master/commands.md#powertop2tuned)
 
-#Tuning for virtualization - Chapter 14 - pg.379
+# Tuning for virtualization - Chapter 14 - pg.379
 
 ##Kernel Samepage Merging(KSM)
 When guests are running identical operating systems and/or workloads, there is a high chance that many memory pages will have the exact same content. Using Kernel Samepage Merging(KSM), total memory usage can be reduced by mergin those identical pages into one memory page. When a guest writes to that page, it will be converted into a new, separate page on the fly.
